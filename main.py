@@ -1,4 +1,6 @@
+from contextlib import asynccontextmanager
 import logging
+from logger import syslog
 import uvicorn
 from pathlib import Path
 from logger import syslog
@@ -12,6 +14,23 @@ app = FastAPI(root_path="/api/v1")
 cfg = device_settings()
 ip2c3 = IP2CC(cfg["host"], cfg["port"])
 
+# READING:
+# https://stackoverflow.com/questions/60715275/fastapi-logging-to-file
+# - https://stackoverflow.com/a/67310566
+# https://fastapi.tiangolo.com/advanced/events/
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start-up options here
+    FORMAT = "{'timestamp':'%(asctime)s', 'level': '%(levelname)s', 'message': '%(message)s'}"
+    logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
+    
+    logger = logging.getLogger("uvicorn.access")
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+    logger.addHandler(handler)
+    
+    yield
+    # any clean-up actions here
 
 @app.get("/config")
 def read_configuration():
@@ -60,12 +79,12 @@ def get_devices():
 
 
 if __name__ == "__main__":
-    FORMAT = "{'timestamp':'%(asctime)s', 'level': '%(levelname)s', 'message': '%(message)s'}"
-    logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
+    #FORMAT = "{'timestamp':'%(asctime)s', 'level': '%(levelname)s', 'message': '%(message)s'}"
+    #logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
     if settings()["power_loss_restore"]:
         create_connection(database_path())
     config = uvicorn.Config(
-        "main:app", port=settings()["web_api_server_port"], log_level="info"
+        "main:app", port=settings()["web_api_server_port"], log_level="info",
     )
     server = uvicorn.Server(config)
     server.run()

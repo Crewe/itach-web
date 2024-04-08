@@ -160,4 +160,5 @@ cython_debug/
 #.idea/
 
 # Databases
-*.db
+*.db.vscode/launch.json
+config.yml
