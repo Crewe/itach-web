@@ -1,4 +1,5 @@
 import re
+from logger import syslog
 from pydantic import BaseModel
 from itach import ItachClient
 from error import ItachError, check_response
@@ -16,7 +17,7 @@ class IP2CCNet(BaseModel):
 
 
 class IP2CC(ItachClient):
-    def __init__(self, host, port, client_type):
+    def __init__(self, host, port, client_type="IP2CC"):
         super().__init__(host, port, client_type)
 
     def send(self, cmd):
