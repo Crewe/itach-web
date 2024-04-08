@@ -15,9 +15,11 @@ cfg = device_settings()
 ip2c3 = IP2CC(cfg["host"], cfg["port"])
 
 # READING:
+# https://github.com/tiangolo/fastapi/discussions/7457
 # https://stackoverflow.com/questions/60715275/fastapi-logging-to-file
 # - https://stackoverflow.com/a/67310566
 # https://fastapi.tiangolo.com/advanced/events/
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Start-up options here
