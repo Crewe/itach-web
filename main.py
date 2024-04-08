@@ -1,15 +1,21 @@
+import logging
+import uvicorn
+from pathlib import Path
+from logger import syslog
 from ip2cc import IP2CC, IP2CCState
 from fastapi import FastAPI, HTTPException
-from config import loadcfg
-
-app = FastAPI()
-cfg = loadcfg()["devices"]["IP2CC"][0]
-ip2c3 = IP2CC(cfg["host"], cfg["port"], "IP2CC")
+from config import device_settings, database_path, settings, log_path
+from database import create_connection
 
 
-@app.get("/")
-def read_root():
-    return loadcfg()
+app = FastAPI(root_path="/api/v1")
+cfg = device_settings()
+ip2c3 = IP2CC(cfg["host"], cfg["port"])
+
+
+@app.get("/config")
+def read_configuration():
+    return cfg
 
 
 @app.get("/version")
@@ -51,3 +57,15 @@ def get_devices():
         return devs
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"{e}")
+
+
+if __name__ == "__main__":
+    FORMAT = "{'timestamp':'%(asctime)s', 'level': '%(levelname)s', 'message': '%(message)s'}"
+    logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
+    if settings()["power_loss_restore"]:
+        create_connection(database_path())
+    config = uvicorn.Config(
+        "main:app", port=settings()["web_api_server_port"], log_level="info"
+    )
+    server = uvicorn.Server(config)
+    server.run()
