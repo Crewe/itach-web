@@ -14,7 +14,7 @@
 #  power_loss_restore: false # Currently not implemented
 
 #database:
-#  path: ./_itach.db
+#  path: itach.db
 
 #logging:
-#  path: ./_itach.log
+#  path: itach.log

@@ -24,10 +24,10 @@ settings:
   power_loss_restore: false # Currently not implemented
 
 database:
-  path: ./_itach.db
+  path: itach.db
 
 logging:
-  path: ./_itach.log
+  path: itach.log
 ```
 
 Add your device to the `IP2CC`. (Currently only one device is supported). Next update the paths
@@ -45,4 +45,4 @@ the device list using an API call.
 
 ## Ready to go!
 
-Fire up the app with ...
+Fire up the app with `python -m itachweb`.

@@ -1,6 +1,6 @@
 import sqlite3
 from sqlite3 import Error
-from logger import syslog
+from ..logger import syslog
 
 
 def create_connection(db_file):

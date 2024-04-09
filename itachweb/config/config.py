@@ -8,7 +8,7 @@ except ImportError:
 
 
 def loadcfg():
-    with open("config.yml", "r") as file:
+    with open("./config.yml", "r") as file:
         cfg = yaml.safe_load(file)
 
     return cfg
