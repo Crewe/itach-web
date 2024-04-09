@@ -43,7 +43,9 @@ class IP2CC(ItachClient):
                         break
 
             except Exception as e:
-                syslog().error(f"An error occurred sending a command to the device at \'{self.svr_host}\'")
+                syslog().error(
+                    f"An error occurred sending a command to the device at '{self.svr_host}'"
+                )
 
         # Throw out the used socket it's trash.
         self.client.close()
@@ -55,7 +57,9 @@ class IP2CC(ItachClient):
             self.connect()
             return self.send("getversion\r")
         except Exception as e:
-            syslog().error(f"Unable to get device version for device at \'{self.svr_host}\'")
+            syslog().error(
+                f"Unable to get device version for device at '{self.svr_host}'"
+            )
             raise Exception("An error has occurred.")
 
     def get_state(self, module, port):
@@ -69,10 +73,15 @@ class IP2CC(ItachClient):
             return self._serialize(resp)
 
         except ValueError as ve:
-            syslog().error(f"Incorrect value used retrieving state for device at \'{self.svr_host}\'", extra=err[1])
+            syslog().error(
+                f"Incorrect value used retrieving state for device at '{self.svr_host}'",
+                extra=err[1],
+            )
             raise ve
         except Exception as e:
-            syslog().error(f"Exception occurred retrieving state for device at \'{self.svr_host}\'")
+            syslog().error(
+                f"Exception occurred retrieving state for device at '{self.svr_host}'"
+            )
             raise e
 
     def set_state(self, module, port, state):
@@ -87,10 +96,15 @@ class IP2CC(ItachClient):
             return self._serialize(resp)
 
         except ValueError as ve:
-            syslog().error(f"Incorrect value used setting state for device at \'{self.svr_host}\'", extra=err[1])
+            syslog().error(
+                f"Incorrect value used setting state for device at '{self.svr_host}'",
+                extra=err[1],
+            )
             raise ve
         except Exception as e:
-            syslog().error(f"Exception occurred setting state for device at \'{self.svr_host}\'")
+            syslog().error(
+                f"Exception occurred setting state for device at '{self.svr_host}'"
+            )
             raise e
 
     def get_net(self, module, port):
@@ -104,10 +118,15 @@ class IP2CC(ItachClient):
             return self._serialize(resp)
 
         except ValueError as ve:
-            syslog().error(f"Incorrect value used getting NET for device at \'{self.svr_host}\'", extra=err[1])
+            syslog().error(
+                f"Incorrect value used getting NET for device at '{self.svr_host}'",
+                extra=err[1],
+            )
             raise ve
         except Exception as e:
-            syslog().error(f"An exception occurred getting NET for device at \'{self.svr_host}\'")
+            syslog().error(
+                f"An exception occurred getting NET for device at '{self.svr_host}'"
+            )
             raise e
 
     def get_devices(self):
@@ -116,13 +135,18 @@ class IP2CC(ItachClient):
             resp = self.send(f"getdevices\r")
             err = check_response(resp)
             if err is not None:
-                syslog().error(f"Incorrect value used getting devices at \'{self.svr_host}\'", extra=err[1])
+                syslog().error(
+                    f"Incorrect value used getting devices at '{self.svr_host}'",
+                    extra=err[1],
+                )
                 raise ValueError(err[1])
 
             return self._serialize(resp)
 
         except Exception as e:
-            syslog().error(f"An exception occurred getting devices at \'{self.svr_host}\'")
+            syslog().error(
+                f"An exception occurred getting devices at '{self.svr_host}'"
+            )
             raise e
 
     def _serialize(self, response: str) -> str:

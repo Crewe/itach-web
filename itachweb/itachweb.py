@@ -66,12 +66,14 @@ def get_devices():
 
 
 def main():
-    FORMAT = "{\"timestamp\": \"%(asctime)s\", \"level\": \"%(levelname)s\", \"message\": \"%(message)s\"}"
+    FORMAT = '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}'
     logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
     if settings()["power_loss_restore"]:
         create_connection(database_path())
     config = uvicorn.Config(
-        "itachweb.itachweb:app", port=settings()["web_api_server_port"], log_level="info"
+        "itachweb.itachweb:app",
+        port=settings()["web_api_server_port"],
+        log_level="info",
     )
     server = uvicorn.Server(config)
     server.run()
