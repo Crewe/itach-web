@@ -21,6 +21,7 @@ setup(
         "uvicorn==0.29.0",
         "pyyaml==6.0.1",
         "build==1.2.1",
+        "jinja2==3.1.3",
     ],
     keywords=["python", "itach", "webUI", "webAPI"],
     classifiers=[

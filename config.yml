@@ -5,9 +5,9 @@
 #      host: 192.168.1.70 # Default IP for no DHCP
 #      port: 4998 # Default TCP Port
 #      contact_closure:
-#        - 0: "Device One" # What will be displayed on UI for control
-#          1: "Device Two"
-#          2: "Device Three"
+#        0: "Device One" # What will be displayed on UI for control
+#        1: "Device Two"
+#        2: "Device Three"
 
 #settings:
 #  web_api_server_port: 8000

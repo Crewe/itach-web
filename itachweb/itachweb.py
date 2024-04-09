@@ -1,17 +1,51 @@
 import logging
 import uvicorn
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
 from .logger import syslog
 from .itach.ip2cc import IP2CC, IP2CCState
 from .config import device_settings, database_path, settings, log_path
 from .database import create_connection
 
 
-app = FastAPI(root_path="/api/v1")
+BASE_PATH = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str("itachweb/templates"))
+
 cfg = device_settings()
 ip2c3 = IP2CC(cfg["host"], cfg["port"])
 
+
+app = FastAPI(title="iTachWeb API", root_path="/api/v1")
+app.mount("/static", StaticFiles(directory="itachweb/static"), name="static")
+
+
+@app.get("/")
+async def dashboard(request: Request):
+    cfg = {
+    "devices": {
+        "IP2CC": [
+            {
+                "id": 0,
+                "name": "IP2CC Device Identifier",
+                "host": "192.168.1.70",
+                "port": 4998,
+                "contact_closure": {
+                    "0": "Device One",
+                    "1": "Device Two",
+                    "2": "Device Three"
+                }
+            }
+        ]
+    }
+}
+    return templates.TemplateResponse(
+        request=request, name="index.html", 
+        context={'devices': cfg['devices']['IP2CC']}
+    )
 
 @app.get("/config")
 def read_configuration():
