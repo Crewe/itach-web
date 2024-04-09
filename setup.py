@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 DESCRIPTION = "iTachWeb: a stand-alone package for managing Global Caché iTach devices."
 LONG_DESCRIPTION = (
     "iTachWeb: a stand-alone package for managing Global Caché iTach devices."
@@ -27,7 +27,5 @@ setup(
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Education",
         "Programming Language :: Python :: 3",
-        # "Operating System :: MacOS :: MacOS X",
-        # "Operating System :: Microsoft :: Windows",
     ],
 )
