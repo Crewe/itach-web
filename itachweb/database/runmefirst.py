@@ -1,6 +1,6 @@
-from database import create_connection, sql_exec
-from config import database_path
-from logger import syslog
+from database.database import create_connection, sql_exec
+from config.config import database_path
+from logger.logger import syslog
 
 
 def initialize_database(drop=False):
