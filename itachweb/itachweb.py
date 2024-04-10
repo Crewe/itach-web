@@ -7,7 +7,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from .logger import syslog
-from .itach.ip2cc import IP2CC, IP2CCPortStates, IP2CCState, IP2CCPortDetail, IP2CCPortUpdate
+from .itach.ip2cc import (
+    IP2CC,
+    IP2CCPortStates,
+    IP2CCState,
+    IP2CCPortDetail,
+    IP2CCPortUpdate,
+)
 from .config import device_settings, database_path, settings, log_path
 from .database import create_connection
 
@@ -16,7 +22,7 @@ BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str("itachweb/templates"))
 
 cfg = device_settings()
-ip2c3 = [IP2CC(host=ip, port=4998) for key,ip in cfg[0].items() if key == 'host']
+ip2c3 = [IP2CC(host=ip, port=4998) for key, ip in cfg[0].items() if key == "host"]
 
 
 app = FastAPI(title="iTachWeb API", root_path="/api/v1")
@@ -26,35 +32,37 @@ app.mount("/static", StaticFiles(directory="itachweb/static"), name="static")
 @app.get("/")
 async def dashboard(request: Request):
     resp = {
-    "devices": {
-        "IP2CC": [
-            {
-                "id": "o9xomlox09pxm",
-                "name": "IP2CC Device Identifier",
-                "host": "192.168.1.70",
-                "contact_closure": {
-                    "port1": {"Device One" : 0},
-                    "port2": {"Device Two" : 1},
-                    "port3": {"Device Three" : 1}
-                }
-            },
-            {
-                "id": "ab409m40",
-                "name": "IP2CC Device Identifier",
-                "host": "192.168.1.72",
-                "contact_closure": {
-                    "port1": {"Device One" : 1},
-                    "port2": {"Device Two" : 0},
-                    "port3": {"Device Three" : 1}
-                }
-            }
-        ]
+        "devices": {
+            "IP2CC": [
+                {
+                    "id": "o9xomlox09pxm",
+                    "name": "IP2CC Device Identifier",
+                    "host": "192.168.1.70",
+                    "contact_closure": {
+                        "port1": {"Device One": 0},
+                        "port2": {"Device Two": 1},
+                        "port3": {"Device Three": 1},
+                    },
+                },
+                {
+                    "id": "ab409m40",
+                    "name": "IP2CC Device Identifier",
+                    "host": "192.168.1.72",
+                    "contact_closure": {
+                        "port1": {"Device One": 1},
+                        "port2": {"Device Two": 0},
+                        "port3": {"Device Three": 1},
+                    },
+                },
+            ]
+        }
     }
-}
     return templates.TemplateResponse(
-        request=request, name="index.html", 
-        context={'devices': resp['devices']['IP2CC']}
+        request=request,
+        name="index.html",
+        context={"devices": resp["devices"]["IP2CC"]},
     )
+
 
 @app.get("/config")
 def read_configuration() -> IP2CCState:

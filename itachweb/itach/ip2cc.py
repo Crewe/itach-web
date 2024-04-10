@@ -6,17 +6,20 @@ from ..logger import syslog
 from .itach import ItachClient
 from ..error import check_response
 
+
 @dataclass
 class IP2CCState(BaseModel):
     module: int
     port: int
     state: int
 
+
 @dataclass
 class IP2CCPortStates(BaseModel):
     port1: int
     port2: int
     port3: int
+
 
 @dataclass
 class IP2CCPortUpdate(BaseModel):
@@ -25,9 +28,9 @@ class IP2CCPortUpdate(BaseModel):
     port: int
     state: int
 
-    #@field_validator('device_id', 'module', 'port', 'state')
-    #@classmethod
-    #def validate_atts(cls, v: int, info: ValidationInfo):
+    # @field_validator('device_id', 'module', 'port', 'state')
+    # @classmethod
+    # def validate_atts(cls, v: int, info: ValidationInfo):
     #    if info.field_name == 'device_id':
     #        if v < 0: raise ValueError(f'{v} is not a valid device id.')
     #    elif info.field_name == 'module':
@@ -38,10 +41,12 @@ class IP2CCPortUpdate(BaseModel):
     #        if not v in range(2): raise ValueError(f'{v} is not a valid state.')
     #    return v
 
+
 @dataclass
 class IP2CCPortDetail(BaseModel):
     name: str
     state: int
+
 
 @dataclass
 class IP2CCClosures(BaseModel):
@@ -49,12 +54,14 @@ class IP2CCClosures(BaseModel):
     port2: IP2CCPortDetail
     port3: IP2CCPortDetail
 
+
 @dataclass
 class IP2CCDataModel(BaseModel):
-        id: int
-        name: str
-        host: str
-        contact_closure: IP2CCClosures
+    id: int
+    name: str
+    host: str
+    contact_closure: IP2CCClosures
+
 
 class IP2CC(ItachClient):
     def __init__(self, host, port=4998, client_type="IP2CC"):
@@ -104,9 +111,9 @@ class IP2CC(ItachClient):
 
     def get_all_port_states(self):
         states = {}
-        for i in range(1,4):
+        for i in range(1, 4):
             port = f"port{i}"
-            states[port] = int(self.get_state(1, i)['state'])
+            states[port] = int(self.get_state(1, i)["state"])
         return states
 
     def get_state(self, module, port):
@@ -226,9 +233,7 @@ class IP2CC(ItachClient):
         else:
             # (get|set)state,<module>:<port>,<state>
             mod_port = resp[1].split(":")
-            s = {"module": mod_port[0], 
-                                                    "port": mod_port[1], 
-                                                    "state":resp[2]}
-            return s 
+            s = {"module": mod_port[0], "port": mod_port[1], "state": resp[2]}
+            return s
 
         return r
