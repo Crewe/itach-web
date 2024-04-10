@@ -1,4 +1,5 @@
 import logging
+from typing import List
 import uvicorn
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
@@ -6,13 +7,15 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+
+from .datamodels.config import IP2CCConfigDataModel
+from .itach.ip2cc import IP2CC
 from .logger import syslog
-from .itach.ip2cc import (
-    IP2CC,
+from .datamodels.ip2cc import (
     IP2CCPortStates,
     IP2CCState,
-    IP2CCPortDetail,
     IP2CCPortUpdate,
+    IP2CCVersion,
 )
 from .config import device_settings, database_path, settings, log_path
 from .database import create_connection
@@ -65,13 +68,13 @@ async def dashboard(request: Request):
 
 
 @app.get("/config")
-def read_configuration() -> IP2CCState:
-    syslog().info("HTTP GET get_NET requested.")
-    return cfg
+def read_configuration() -> IP2CCConfigDataModel:
+    syslog().info("HTTP GET config requested.")
+    return IP2CCConfigDataModel(**cfg[0])
 
 
 @app.get("/version")
-def get_version(device_id: int):
+def get_version(device_id: int) -> IP2CCVersion:
     syslog().info("HTTP GET version requested.")
     return {"version": ip2c3[device_id].get_version()[0]}
 
