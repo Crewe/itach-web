@@ -45,4 +45,4 @@ the device list using an API call.
 
 ## Ready to go!
 
-Fire up the app with `python -m itachweb`.
+Fire up the app with `python -m itachweb` and access the UI from `http://localhost:8000/`.

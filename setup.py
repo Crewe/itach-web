@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 DESCRIPTION = "iTachWeb: a stand-alone package for managing Global Caché iTach devices."
 LONG_DESCRIPTION = (
     "iTachWeb: a stand-alone package for managing Global Caché iTach devices."
@@ -21,6 +21,7 @@ setup(
         "uvicorn==0.29.0",
         "pyyaml==6.0.1",
         "build==1.2.1",
+        "jinja2==3.1.3",
     ],
     keywords=["python", "itach", "webUI", "webAPI"],
     classifiers=[
