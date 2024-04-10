@@ -48,7 +48,7 @@ class IP2CC(ItachClient):
             self.connect()
             ver = self.send("getversion\r")[0]
             return IP2CCVersion(version=ver)
-        
+
         except Exception as e:
             syslog().error(
                 f"Unable to get device version for device at '{self.svr_host}'"

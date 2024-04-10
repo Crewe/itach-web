@@ -28,12 +28,14 @@ class IP2CCPortDetail(BaseModel):
     name: str
     state: int
 
+
 class IP2CCNetDetail(BaseModel):
     cfglock: str
     IPconfig: str
     IPaddr: str
     subnet: str
     gateway: str
+
 
 class IP2CCClosures(BaseModel):
     port1: IP2CCPortDetail

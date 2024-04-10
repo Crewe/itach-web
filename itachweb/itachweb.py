@@ -36,17 +36,22 @@ app.mount("/static", StaticFiles(directory="itachweb/static"), name="static")
 
 @app.get("/ip2cc", response_class=HTMLResponse)
 async def dashboard(request: Request):
-    
+
     dvm = []
     for i in range(len(cfg)):
-        port = get_port_states(device_id=i) 
+        port = get_port_states(device_id=i)
         device = IP2CCConfigDataModel(**cfg[i])
-        dvm.append({"id": device.id,
-                    "name": device.name,
-                    "host": device.host,
-                    "ports": {device.contact_closure.port1.name: port['port1'],
-                    device.contact_closure.port2.name: port['port2'],
-                    device.contact_closure.port3.name: port['port3'],}}
+        dvm.append(
+            {
+                "id": device.id,
+                "name": device.name,
+                "host": device.host,
+                "ports": {
+                    device.contact_closure.port1.name: port["port1"],
+                    device.contact_closure.port2.name: port["port2"],
+                    device.contact_closure.port3.name: port["port3"],
+                },
+            }
         )
 
     return templates.TemplateResponse(
@@ -55,22 +60,25 @@ async def dashboard(request: Request):
         context={"devices": dvm},
     )
 
+
 @app.get("/ip2cc/{device_id}/details", response_class=HTMLResponse)
 async def device_detail(request: Request, device_id: int):
-   
+
     # Data merge... this is gross...
     v = get_version(device_id=device_id)
-    net = get_net(0,1,device_id)
+    net = get_net(0, 1, device_id)
     ports = get_port_states(device_id=device_id)
     data = IP2CCConfigDataModel(**cfg[device_id])
     data = data.model_dump()
-    data['version'] = v.version
-    data['eth'] = net
-    
+    data["version"] = v.version
+    data["eth"] = net
+
     # new ports
     prts = {}
-    for i in range(1,4):
-        prts[f"port{i}"] = {data['contact_closure'][f"port{i}"]['name']: ports[f"port{i}"]}
+    for i in range(1, 4):
+        prts[f"port{i}"] = {
+            data["contact_closure"][f"port{i}"]["name"]: ports[f"port{i}"]
+        }
 
     return templates.TemplateResponse(
         request=request,
