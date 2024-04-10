@@ -15,7 +15,7 @@ devices:
           default_state : 0
 
 settings:
-  web_api_server_port: 8000
+  server_port: 8000
 
 database:
   path: itach.db

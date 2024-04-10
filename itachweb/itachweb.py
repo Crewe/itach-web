@@ -8,6 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
+from .datamodels.ip2cc import IP2CCDataModel, IP2CCNetDetail
+
 from .datamodels.config import IP2CCConfigDataModel
 from .itach.ip2cc import IP2CC
 from .logger import syslog
@@ -32,38 +34,48 @@ app = FastAPI(title="iTachWeb API", root_path="/api/v1")
 app.mount("/static", StaticFiles(directory="itachweb/static"), name="static")
 
 
-@app.get("/")
+@app.get("/ip2cc", response_class=HTMLResponse)
 async def dashboard(request: Request):
-    resp = {
-        "devices": {
-            "IP2CC": [
-                {
-                    "id": "o9xomlox09pxm",
-                    "name": "IP2CC Device Identifier",
-                    "host": "192.168.1.70",
-                    "contact_closure": {
-                        "port1": {"Device One": 0},
-                        "port2": {"Device Two": 1},
-                        "port3": {"Device Three": 1},
-                    },
-                },
-                {
-                    "id": "ab409m40",
-                    "name": "IP2CC Device Identifier",
-                    "host": "192.168.1.72",
-                    "contact_closure": {
-                        "port1": {"Device One": 1},
-                        "port2": {"Device Two": 0},
-                        "port3": {"Device Three": 1},
-                    },
-                },
-            ]
-        }
-    }
+    
+    dvm = []
+    for i in range(len(cfg)):
+        port = get_port_states(device_id=i) 
+        device = IP2CCConfigDataModel(**cfg[i])
+        dvm.append({"id": device.id,
+                    "name": device.name,
+                    "host": device.host,
+                    "ports": {device.contact_closure.port1.name: port['port1'],
+                    device.contact_closure.port2.name: port['port2'],
+                    device.contact_closure.port3.name: port['port3'],}}
+        )
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"devices": resp["devices"]["IP2CC"]},
+        context={"devices": dvm},
+    )
+
+@app.get("/ip2cc/{device_id}/details", response_class=HTMLResponse)
+async def device_detail(request: Request, device_id: int):
+   
+    # Data merge... this is gross...
+    v = get_version(device_id=device_id)
+    net = get_net(0,1,device_id)
+    ports = get_port_states(device_id=device_id)
+    data = IP2CCConfigDataModel(**cfg[device_id])
+    data = data.model_dump()
+    data['version'] = v.version
+    data['eth'] = net
+    
+    # new ports
+    prts = {}
+    for i in range(1,4):
+        prts[f"port{i}"] = {data['contact_closure'][f"port{i}"]['name']: ports[f"port{i}"]}
+
+    return templates.TemplateResponse(
+        request=request,
+        name="detail.html",
+        context={"details": data},
     )
 
 
@@ -76,7 +88,7 @@ def read_configuration() -> IP2CCConfigDataModel:
 @app.get("/version")
 def get_version(device_id: int) -> IP2CCVersion:
     syslog().info("HTTP GET version requested.")
-    return {"version": ip2c3[device_id].get_version()[0]}
+    return ip2c3[device_id].get_version()
 
 
 @app.get("/{module}/{port}/state")
@@ -110,7 +122,7 @@ def set_state(state: IP2CCPortUpdate) -> IP2CCState:
 
 
 @app.get("/{module}/{port}/net")
-def get_net(module: int, port: int, device_id: int):
+def get_net(module: int, port: int, device_id: int) -> IP2CCNetDetail:
     syslog().info("HTTP GET get_NET requested.")
     try:
         n = ip2c3[device_id].get_net(module, port)
@@ -132,11 +144,9 @@ def get_modules(device_id: int):
 def main():
     FORMAT = '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}'
     logging.basicConfig(filename=log_path(), level=logging.INFO, format=FORMAT)
-    if settings()["power_loss_restore"]:
-        create_connection(database_path())
     config = uvicorn.Config(
         "itachweb.itachweb:app",
-        port=settings()["web_api_server_port"],
+        port=settings()["server_port"],
         log_level="info",
     )
     server = uvicorn.Server(config)

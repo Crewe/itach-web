@@ -28,6 +28,12 @@ class IP2CCPortDetail(BaseModel):
     name: str
     state: int
 
+class IP2CCNetDetail(BaseModel):
+    cfglock: str
+    IPconfig: str
+    IPaddr: str
+    subnet: str
+    gateway: str
 
 class IP2CCClosures(BaseModel):
     port1: IP2CCPortDetail
@@ -39,4 +45,6 @@ class IP2CCDataModel(BaseModel):
     id: int
     name: str
     host: str
+    version: str | None = None
     contact_closure: IP2CCClosures
+    eth: IP2CCNetDetail | None = None

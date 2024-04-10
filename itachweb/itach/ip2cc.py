@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from ..datamodels.ip2cc import IP2CCState
+from ..datamodels.ip2cc import IP2CCState, IP2CCVersion
 from ..logger import syslog
 from .itach import ItachClient
 from ..error import check_response
@@ -43,10 +43,12 @@ class IP2CC(ItachClient):
         self.client = None
         return r
 
-    def get_version(self):
+    def get_version(self) -> IP2CCVersion:
         try:
             self.connect()
-            return self.send("getversion\r")
+            ver = self.send("getversion\r")[0]
+            return IP2CCVersion(version=ver)
+        
         except Exception as e:
             syslog().error(
                 f"Unable to get device version for device at '{self.svr_host}'"
