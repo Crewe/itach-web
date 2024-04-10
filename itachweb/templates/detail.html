@@ -1,3 +1,6 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{%
+    endfor %}{%- endmacro -%}
+
     {% include 'header.html' %}
     <!-- Content -->
     <div class="container">
@@ -28,10 +31,11 @@
                                         {% set guid = random_string(8) %}
                                         {% for name, state in p_data.items() %}
                                         <input class="form-check-input" type="checkbox" role="switch"
-                                            id="flexSwitchCheckDefault-{{ p }}-{{ guid }}" {{ "checked" if state == 1 else "" }}/>
+                                        id="flexSwitchCheckDefault-{{ device.id }}-{{ guid }}" 
+                                        checked="{{ 'checked' if state == 1 else '' }}"/>
                                         <label class="form-check-label" for="flexSwitchCheckDefault-{{ p }}-{{ guid }}"
                                             style="font-family:monospace;">
-                                            Port {{ p }}: {{ name }}
+                                            {{ name }}
                                         </label>
                                         {% endfor %}
                                     </div>
