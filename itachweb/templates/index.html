@@ -1,3 +1,5 @@
+{% macro random_string(len) -%}{% for i in range(0,len) -%}{{ [0,1,2,3,4,5,6,7,8,9,"a","b","c","d","e","f"]|random }}{% endfor %}{%- endmacro -%}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,10 +7,14 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
+    <meta name="description" content="iTachWeb Device Dashboard" />
+    <meta name="author" content="Ryan Edwards-Crewe" />
     <title>iTachWeb | Dashboard</title>
     <link href="{{ url_for('static', path='/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='/favicon-16x16.png') }}">
+    <link rel="manifest" href="/site.webmanifest">
     <!-- <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script> -->
 </head>
 
@@ -60,19 +66,22 @@
                         <div class="card-body overflow-hidden">
                             <h5 class="card-title">{{ device.name }}</h5>
                             <p class="card-text" style="font-family:monospace;">
-                                Host: {{ device.host }}:{{ device.port}}
+                                Host: <a href="http://{{ device.host }}" target="_device_access">
+                                    http://{{ device.host }}</a>
                             </p>
                             <div class="row" style="text-align:left;">
                                 <div class="">
-                                    {% for p, name in device.contact_closure.items() %}
-
+                                    {% for p, p_data in device.contact_closure.items() %}
                                     <div class="form-check form-switch">
+                                        {% set guid = random_string(8) %}
+                                        {% for name, state in p_data.items() %}
                                         <input class="form-check-input" type="checkbox" role="switch"
-                                            id="flexSwitchCheckDefault-{{ p }}">
-                                        <label class="form-check-label" for="flexSwitchCheckDefault-{{ p }}"
+                                            id="flexSwitchCheckDefault-{{ p }}-{{ guid }}" {{ "checked" if state == 1 else "" }}/>
+                                        <label class="form-check-label" for="flexSwitchCheckDefault-{{ p }}-{{ guid }}"
                                             style="font-family:monospace;">
                                             Port {{ p }}: {{ name }}
                                         </label>
+                                        {% endfor %}
                                     </div>
                                     {% endfor %}
                                 </div>

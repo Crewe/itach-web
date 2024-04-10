@@ -1,23 +1,63 @@
 import re
-from pydantic import BaseModel
+from typing import List
+from pydantic import BaseModel, ValidationInfo, field_validator
+from dataclasses import dataclass, replace
 from ..logger import syslog
 from .itach import ItachClient
 from ..error import check_response
 
-
+@dataclass
 class IP2CCState(BaseModel):
-    module: int  # = 1
+    module: int
     port: int
     state: int
 
+@dataclass
+class IP2CCPortStates(BaseModel):
+    port1: int
+    port2: int
+    port3: int
 
-class IP2CCNet(BaseModel):
-    module: int  # = 0
+@dataclass
+class IP2CCPortUpdate(BaseModel):
+    device_id: int
+    module: int = 1
     port: int
+    state: int
 
+    #@field_validator('device_id', 'module', 'port', 'state')
+    #@classmethod
+    #def validate_atts(cls, v: int, info: ValidationInfo):
+    #    if info.field_name == 'device_id':
+    #        if v < 0: raise ValueError(f'{v} is not a valid device id.')
+    #    elif info.field_name == 'module':
+    #        if v != 1: raise ValueError(f'{v} is not a valid module.')
+    #    elif info.field_name == 'port':
+    #         if not v in range(1,4): raise ValueError(f'{v} is not a valid port number.')
+    #    elif info.field_name == 'state':
+    #        if not v in range(2): raise ValueError(f'{v} is not a valid state.')
+    #    return v
+
+@dataclass
+class IP2CCPortDetail(BaseModel):
+    name: str
+    state: int
+
+@dataclass
+class IP2CCClosures(BaseModel):
+    port1: IP2CCPortDetail
+    port2: IP2CCPortDetail
+    port3: IP2CCPortDetail
+
+@dataclass
+class IP2CCDataModel(BaseModel):
+        id: int
+        name: str
+        host: str
+        contact_closure: IP2CCClosures
 
 class IP2CC(ItachClient):
-    def __init__(self, host, port, client_type="IP2CC"):
+    def __init__(self, host, port=4998, client_type="IP2CC"):
         super().__init__(host, port, client_type)
 
     def send(self, cmd):
@@ -62,6 +102,13 @@ class IP2CC(ItachClient):
             )
             raise Exception("An error has occurred.")
 
+    def get_all_port_states(self):
+        states = {}
+        for i in range(1,4):
+            port = f"port{i}"
+            states[port] = int(self.get_state(1, i)['state'])
+        return states
+
     def get_state(self, module, port):
         try:
             self.connect()
@@ -75,7 +122,7 @@ class IP2CC(ItachClient):
         except ValueError as ve:
             syslog().error(
                 f"Incorrect value used retrieving state for device at '{self.svr_host}'",
-                extra=err[1],
+                extra={"details": err[1]},
             )
             raise ve
         except Exception as e:
@@ -98,7 +145,7 @@ class IP2CC(ItachClient):
         except ValueError as ve:
             syslog().error(
                 f"Incorrect value used setting state for device at '{self.svr_host}'",
-                extra=err[1],
+                extra={"details": err[1]},
             )
             raise ve
         except Exception as e:
@@ -120,7 +167,7 @@ class IP2CC(ItachClient):
         except ValueError as ve:
             syslog().error(
                 f"Incorrect value used getting NET for device at '{self.svr_host}'",
-                extra=err[1],
+                extra={"details": err[1]},
             )
             raise ve
         except Exception as e:
@@ -129,7 +176,7 @@ class IP2CC(ItachClient):
             )
             raise e
 
-    def get_devices(self):
+    def get_modules(self):
         try:
             self.connect()
             resp = self.send(f"getdevices\r")
@@ -137,7 +184,7 @@ class IP2CC(ItachClient):
             if err is not None:
                 syslog().error(
                     f"Incorrect value used getting devices at '{self.svr_host}'",
-                    extra=err[1],
+                    extra={"details": err[1]},
                 )
                 raise ValueError(err[1])
 
@@ -149,7 +196,7 @@ class IP2CC(ItachClient):
             )
             raise e
 
-    def _serialize(self, response: str) -> str:
+    def _serialize(self, response: str) -> object:
         r = {}
         resp = None
         if type(response) is not list:
@@ -179,8 +226,9 @@ class IP2CC(ItachClient):
         else:
             # (get|set)state,<module>:<port>,<state>
             mod_port = resp[1].split(":")
-            r["module"] = mod_port[0]
-            r["port"] = mod_port[1]
-            r["state"] = resp[2]
+            s = {"module": mod_port[0], 
+                                                    "port": mod_port[1], 
+                                                    "state":resp[2]}
+            return s 
 
         return r

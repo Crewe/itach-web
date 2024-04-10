@@ -15,7 +15,7 @@ def loadcfg():
 
 
 def device_settings():
-    return loadcfg()["devices"]["IP2CC"][0]
+    return loadcfg()["devices"]["IP2CC"]
 
 
 def database_path():
