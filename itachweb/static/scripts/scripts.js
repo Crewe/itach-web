@@ -4,7 +4,6 @@ $(window).on('load', function() {
   $.get("/api/v1/ip2cc/portstates?device_id=0", function( data ) {
     //ports = $("#ccports").children();
     $.each(data, function(i, v) {
-      console.log(i + ": " + v);
       if (v == 0) {
         $("#"+i).removeAttr('checked', 'checked');
       } else {
@@ -17,15 +16,15 @@ $(window).on('load', function() {
 
   $('.form-check-input').click( function(data) {
     if ($(this)[0].checked == true) {
-      console.log( $(this).attr('id') + " -> CHECKED!" );
+      //console.log( $(this).attr('id') + " -> CHECKED!" );
       setPortState($(this).parent().parent().data().deviceid, 
-                   $(this).data().portid, 0);
+                   $(this).data().portid, 1);
       
     }
     else {
-      console.log( $(this).attr('id') + " -> UNchecked!" );
+      //console.log( $(this).attr('id') + " -> UNchecked!" );
       setPortState($(this).parent().parent().data().deviceid, 
-                   $(this).data().portid, 1);
+                   $(this).data().portid, 0);
     };
     // refresh the switch state
 
@@ -35,17 +34,25 @@ $(window).on('load', function() {
 
 function setPortState(deviceId, portId, state) {
 
-  var data = {
+  data = {
     'device_id': deviceId,
+    'module': 1,
     'port': portId,
     'state': state,
   }
-  // Returns 422 for some reason...
-  $.post("/state", 
-         JSON.stringify(data),
-         function (data, textStatus, jqXHR) {
-           console.log(data)
-         });
+
+  $.ajax({
+    type: "POST",
+    url: "/state",
+    data: JSON.stringify(data),
+    dataType: "application/json",
+    success: function (response) {
+      $("#port"+portId).dispatchEvent(new Event("change"));
+    },
+    fail: function (response) {
+      console.log("FALE");
+    }
+  });
 };
 
 function getPortStates(deviceId) {
@@ -54,4 +61,8 @@ function getPortStates(deviceId) {
     console.log( typeof data ); // string
     console.log( data ); // HTML content of the jQuery.ajax page
   });
+};
+
+function updateUIwitch(elem){
+  $(elem).dispatchEvent(new Event("change"));
 };

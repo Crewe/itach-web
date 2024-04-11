@@ -1,10 +1,8 @@
 import logging
-from typing import List
 import uvicorn
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
@@ -89,19 +87,19 @@ async def device_detail(request: Request, device_id: int):
     )
 
 
-@app.get("/config")
+@app.get("/config", response_model=IP2CCConfigDataModel)
 def read_configuration() -> IP2CCConfigDataModel:
     syslog().info("HTTP GET config requested.")
     return IP2CCConfigDataModel(**cfg[0])
 
 
-@app.get("/version")
+@app.get("/version", response_model=IP2CCVersion)
 def get_version(device_id: int) -> IP2CCVersion:
     syslog().info("HTTP GET version requested.")
     return ip2c3[device_id].get_version()
 
 
-@app.get("/{module}/{port}/state")
+@app.get("/{module}/{port}/state", response_model=IP2CCState)
 def get_state(module: int, port: int, device_id: int) -> IP2CCState:
     syslog().info("HTTP GET state requested.")
     try:
@@ -111,7 +109,7 @@ def get_state(module: int, port: int, device_id: int) -> IP2CCState:
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
-@app.get("/ip2cc/portstates")
+@app.get("/ip2cc/portstates", response_model=IP2CCPortStates)
 def get_port_states(device_id: int) -> IP2CCPortStates:
     syslog().info("HTTP GET state requested.")
     try:
@@ -121,17 +119,21 @@ def get_port_states(device_id: int) -> IP2CCPortStates:
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
-@app.post("/state")
-def set_state(state: IP2CCPortUpdate) -> IP2CCState:
+@app.post("/state", response_model=IP2CCState)
+#def set_state(state: IP2CCPortUpdate) -> IP2CCState:
+async def set_state(request: Request):# -> IP2CCState:
     syslog().info("HTTP POST state requested.")
     try:
-        s = ip2c3[state.device_id].set_state(state.module, state.port, state.state)
+        state = await request.json()
+        
+        s = ip2c3[state['device_id']].set_state(
+            state['module'], state['port'], state['state'])
         return s
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
-@app.get("/{module}/{port}/net")
+@app.get("/{module}/{port}/net", response_model=IP2CCNetDetail)
 def get_net(module: int, port: int, device_id: int) -> IP2CCNetDetail:
     syslog().info("HTTP GET get_NET requested.")
     try:

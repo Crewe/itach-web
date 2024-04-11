@@ -32,7 +32,7 @@
                                         <input class="form-check-input" type="checkbox" role="switch"
                                         id="port{{ loop.index }}" data-portid="{{ loop.index }}" 
                                         data-portstate="{{ state }}"
-                                        {{ "checked='checked'" if state == 1 else '' }}"/>
+                                        {{ "checked=\"checked\""|tojson if state == 1 else '' }}"/>
                                         <label class="form-check-label" for="port{{ loop.index }}"
                                             style="font-family:monospace;">
                                             {{ name }}
