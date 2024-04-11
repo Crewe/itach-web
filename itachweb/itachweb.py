@@ -8,8 +8,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-from .datamodels.ip2cc import IP2CCDataModel, IP2CCNetDetail
+from .app import app
 
+# from .routers.api import v1_api_router
+from .datamodels.ip2cc import IP2CCDataModel, IP2CCNetDetail
 from .datamodels.config import IP2CCConfigDataModel
 from .itach.ip2cc import IP2CC
 from .logger import syslog
@@ -28,10 +30,6 @@ templates = Jinja2Templates(directory=str("itachweb/templates"))
 
 cfg = device_settings()
 ip2c3 = [IP2CC(host=ip, port=4998) for key, ip in cfg[0].items() if key == "host"]
-
-
-app = FastAPI(title="iTachWeb API", root_path="/api/v1")
-app.mount("/static", StaticFiles(directory="itachweb/static"), name="static")
 
 
 @app.get("/ip2cc", response_class=HTMLResponse)
