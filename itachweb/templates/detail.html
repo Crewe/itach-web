@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2>Device Details</h2>
+                <h2>{{ device.name }} Details</h2>
             </div>
         </div>
         <div class="row">
@@ -26,10 +26,9 @@
                             </p>
                             <div class="row" style="text-align:left;">
                                 <div class="">
-                                    {% for p, p_data in device.contact_closure.items() %}
+                                    {% for name, state in device.ports.items() %}
+                                    {% set guid = random_string(8) %}
                                     <div class="form-check form-switch">
-                                        {% set guid = random_string(8) %}
-                                        {% for name, state in p_data.items() %}
                                         <input class="form-check-input" type="checkbox" role="switch"
                                         id="flexSwitchCheckDefault-{{ device.id }}-{{ guid }}" 
                                         checked="{{ 'checked' if state == 1 else '' }}"/>
@@ -37,9 +36,14 @@
                                             style="font-family:monospace;">
                                             {{ name }}
                                         </label>
-                                        {% endfor %}
                                     </div>
                                     {% endfor %}
+                                    <hr/>
+                                    <p style="font-family:monospace;">
+                                        {% for k,v in device.eth.items() %}
+                                        {{ k }}: {{ v }}<br/>
+                                        {% endfor %}
+                                    </p>
                                 </div>
                             </div>
                         </div>

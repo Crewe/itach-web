@@ -57,33 +57,37 @@ async def dashboard(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"devices": dvm},
+        context={"page_title": "Dashboard", "devices": dvm},
     )
 
 
 @app.get("/ip2cc/{device_id}/details", response_class=HTMLResponse)
 async def device_detail(request: Request, device_id: int):
 
-    # Data merge... this is gross...
-    v = get_version(device_id=device_id)
-    net = get_net(0, 1, device_id)
-    ports = get_port_states(device_id=device_id)
-    data = IP2CCConfigDataModel(**cfg[device_id])
-    data = data.model_dump()
-    data["version"] = v.version
-    data["eth"] = net
-
-    # new ports
-    prts = {}
-    for i in range(1, 4):
-        prts[f"port{i}"] = {
-            data["contact_closure"][f"port{i}"]["name"]: ports[f"port{i}"]
+    dvm = []
+    port = get_port_states(device_id=device_id)
+    device = IP2CCConfigDataModel(**cfg[device_id])
+    dvm.append(
+        {
+            "id": device.id,
+            "name": device.name,
+            "host": device.host,
+            "version": get_version(device_id=device_id).version,
+            "ports": {
+                device.contact_closure.port1.name: port["port1"],
+                device.contact_closure.port2.name: port["port2"],
+                device.contact_closure.port3.name: port["port3"],
+            },
+            "eth": get_net(0, 1, device_id),
         }
+    )
+    del dvm[0]["eth"]["module"]
+    del dvm[0]["eth"]["port"]
 
     return templates.TemplateResponse(
         request=request,
         name="detail.html",
-        context={"details": data},
+        context={"page_title": dvm[0]["name"], "device": dvm[0]},
     )
 
 
