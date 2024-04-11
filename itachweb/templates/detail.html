@@ -25,19 +25,22 @@
                                     http://{{ device.host }}</a>
                             </p>
                             <div class="row" style="text-align:left;">
-                                <div class="">
+                                <div id="ccports" class="" data-deviceId="{{ device.id }}">
                                     {% for name, state in device.ports.items() %}
                                     {% set guid = random_string(8) %}
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckDefault-{{ device.id }}-{{ guid }}" 
-                                        checked="{{ 'checked' if state == 1 else '' }}"/>
-                                        <label class="form-check-label" for="flexSwitchCheckDefault-{{ p }}-{{ guid }}"
+                                        id="port{{ loop.index }}" data-portid="{{ loop.index }}" 
+                                        data-portstate="{{ state }}"
+                                        {{ "checked='checked'" if state == 1 else '' }}"/>
+                                        <label class="form-check-label" for="port{{ loop.index }}"
                                             style="font-family:monospace;">
                                             {{ name }}
                                         </label>
                                     </div>
                                     {% endfor %}
+                                    </div>
+                                    <div id="ethport" class="">
                                     <hr/>
                                     <p style="font-family:monospace;">
                                         {% for k,v in device.eth.items() %}
