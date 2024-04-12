@@ -21,16 +21,16 @@ devices:
       contact_closure:
         port1: 
           name: "Device One" # What will be displayed on UI for control panel
-          pwr_on_state : 0   # After power loss what should be the port state (default: 0)
+          default_state : 0   # After power loss what should be the port state (default: 0)
         port2: 
           name: "Device Two"
-          pwr_on_state: 0
+          default_state: 0
         port3: 
           name: "Device Three"
-          pwr_on_state : 0
+          default_state : 0
 
 settings:
-  web_api_server_port: 8000
+  server_port: 8000
 
 database:
   path: itach.db

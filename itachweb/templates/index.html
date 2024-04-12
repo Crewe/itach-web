@@ -6,7 +6,7 @@ endfor %}{%- endmacro -%}
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <h2>Device Dashboard</h2>
+            <h2>IP2CC Device Dashboard</h2>
         </div>
     </div>
     <div class="row">
@@ -20,25 +20,17 @@ endfor %}{%- endmacro -%}
                 <div class="col-md-8" style="background-color:#ffc107;">
                     <div class="card-body overflow-hidden">
                         <h5 class="card-title">{{ device.name }}</h5>
-                        <p class="card-text" style="font-family:monospace;">
-                            Host: <a href="http://{{ device.host }}" target="_device_access">
-                                http://{{ device.host }}</a>
-                        </p>
-                        <div class="row" style="text-align:left;">
+                        <div class="row">
                             <div id="ccports" class="">
                                 {% for name, state in device.ports.items() %}
                                 {% set guid = random_string(8) %}
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                        id="flexSwitchCheckDefault-{{ device.id }}-{{ guid }}" 
-                                        checked="{{ 'checked' if state == 1 else '' }}" data-toggle="toggle"/>
-                                    <label class="form-check-label"
-                                        for="flexSwitchCheckDefault-{{ device.id }}-{{ guid }}"
-                                        style="font-family:monospace;">
-                                        {{ name }}
-                                    </label>
+                                <div class="statusRow">
+                                    <span class="statusCube {{ 'cubeOff' if state == 0 else 'cubeOn' }}"></span>
+                                    <span class="statusLabel">{{ name }}</span>
                                 </div>
                                 {% endfor %}
+                                <hr/>
+                                <span><a href="{{ url_for('device_detail').include_query_params(deviceId=device.id) }}">Details ></a></span>
                             </div>
                         </div>
                     </div>
