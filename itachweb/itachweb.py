@@ -63,7 +63,7 @@ async def device_detail(request: Request, deviceId: int):
             "id": device.id,
             "name": device.name,
             "host": device.host,
-            "version": get_version(device_id=deviceId).version,
+            "version": get_version(deviceId=deviceId).version,
             "ports": {
                 device.contact_closure.port1.name: port["port1"],
                 device.contact_closure.port2.name: port["port2"],
@@ -89,9 +89,9 @@ def read_configuration() -> IP2CCConfigDataModel:
 
 
 @app.get("/version", response_model=IP2CCVersion)
-def get_version(device_id: int) -> IP2CCVersion:
+def get_version(deviceId: int) -> IP2CCVersion:
     syslog().info("HTTP GET version requested.")
-    return ip2c3[device_id].get_version()
+    return ip2c3[deviceId].get_version()
 
 
 @app.get("/{module}/{port}/state", response_model=IP2CCState)
