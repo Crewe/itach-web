@@ -2,9 +2,14 @@
 
 I needed a Web front-end to an industrial ethernet relay contact closure device. So now, this.
 
+## Add the devices to your network
+
+First you will need to add the devices to your network and take down their details,
+notably their IP addresses. Update your configuration file with the details.
+
 ## Setup and Configuration
 
-You will first need to edit your `config.yaml`. This outlines the devices on your network, and how
+Now to edit your `config.yml`. This outlines the devices on your network, and how
 each port is configured.
 
 ```yml
@@ -13,15 +18,19 @@ devices:
     - id: 0
       name: "IP2CC Device Identifier"
       host: 192.168.1.70 # Default IP for no DHCP
-      port: 4998         # Default TCP Port
       contact_closure:
-        - 0: "Device One" # What will be displayed on UI for control
-          1: "Device Two"
-          2: "Device Three"
+        port1: 
+          name: "Device One" # What will be displayed on UI for control panel
+          default_state : 0   # After power loss what should be the port state (default: 0)
+        port2: 
+          name: "Device Two"
+          default_state: 0
+        port3: 
+          name: "Device Three"
+          default_state : 0
 
 settings:
-  web_api_server_port: 8000
-  power_loss_restore: false # Currently not implemented
+  server_port: 8000
 
 database:
   path: itach.db
@@ -35,14 +44,6 @@ to where you want the database and logs to be stored. Because the devices reset 
 state after a power loss event, this will allow you to have the ports restore to their pre-power-loss
 status, assuming it didn't occur duing a port state change.
 
-## Create the database if needed
-
-If you wish to use the `power_loss_restore` you will first need to create the database by runing `runfirst.py`
-this will initialize the database with your currrent devices and port descriptions. If you need to update your
-settings or device names simply delete the database file, and run `runfirst.py` again. You will obviously lose
-your power loss settings. Though I may remedy this is the future with an API call to pull the settings from
-the device list using an API call.
-
 ## Ready to go!
 
-Fire up the app with `python -m itachweb` and access the UI from `http://localhost:8000/`.
+Fire up the app with `python3 -m itachweb` and access the UI from `http://localhost:8000/`.
