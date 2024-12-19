@@ -46,4 +46,4 @@ status, assuming it didn't occur duing a port state change.
 
 ## Ready to go!
 
-Fire up the app with `python3 -m itachweb` and access the UI from `http://localhost:8000/`.
+Fire up the app with `python3 -m itachweb`, or using docker with `docker compose up -d`, and access the UI from `http://localhost:8000/ip2cc`.

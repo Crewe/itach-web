@@ -1,5 +1,7 @@
+name: itachweb
+
 services:
   server:
     build: .
-    ports:
-      - 8000:8000
+    restart: unless-stopped
+    network_mode: "host"
