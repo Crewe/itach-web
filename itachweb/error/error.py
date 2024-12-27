@@ -8,7 +8,7 @@ ItachError = {
     "016": "No Carriage Return",
     "023": "Invalid Parameter",
     "027": "Settings Locked",
-    # Sensons
+    # Sensors
     "018": "Not a sensor or a relay",
 }
 
