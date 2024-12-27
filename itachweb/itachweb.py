@@ -1,6 +1,6 @@
 from pathlib import Path
-from fastapi import HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi import HTTPException, Request, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
@@ -25,25 +25,33 @@ cfg = device_settings()
 ip2c3 = [IP2CC(host=ip, port=4998) for key, ip in cfg[0].items() if key == "host"]
 
 
+@app.get("/")
+async def landing():
+    return RedirectResponse(url="/ip2cc", status_code=status.HTTP_302_FOUND)
+
+
 @app.get("/ip2cc", response_class=HTMLResponse)
 async def dashboard(request: Request):
 
     dvm = []
     for i in range(len(cfg)):
-        port = get_port_states(deviceId=i)
-        device = IP2CCConfigDataModel(**cfg[i])
-        dvm.append(
-            {
-                "id": device.id,
-                "name": device.name,
-                "host": device.host,
-                "ports": {
-                    device.contact_closure.port1.name: port["port1"],
-                    device.contact_closure.port2.name: port["port2"],
-                    device.contact_closure.port3.name: port["port3"],
-                },
-            }
-        )
+        try:
+            port = get_port_states(deviceId=i)
+            device = IP2CCConfigDataModel(**cfg[i])
+            dvm.append(
+                {
+                    "id": device.id,
+                    "name": device.name,
+                    "host": device.host,
+                    "ports": {
+                        device.contact_closure.port1.name: port["port1"],
+                        device.contact_closure.port2.name: port["port2"],
+                        device.contact_closure.port3.name: port["port3"],
+                    },
+                }
+            )
+        except HTTPException as e:
+            pass
 
     return templates.TemplateResponse(
         request=request,
