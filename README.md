@@ -1,6 +1,6 @@
 # A Web API for Global Caché's iTach IP2CC
 
-I needed a Web front-end to an industrial ethernet relay contact closure device. So now, this.
+I needed a Web front-end to an industrial Ethernet relay contact closure device. So now, this.
 
 ## Add the devices to your network
 
@@ -31,6 +31,7 @@ devices:
 
 settings:
   server_port: 8000
+  server_host: "::" # Change to IP of server if running remotely. Default is localhost.
 
 database:
   path: itach.db
@@ -42,7 +43,7 @@ logging:
 Add your device to the `IP2CC`. (Currently only one device is supported). Next update the paths
 to where you want the database and logs to be stored. Because the devices reset to their disconnected
 state after a power loss event, this will allow you to have the ports restore to their pre-power-loss
-status, assuming it didn't occur duing a port state change.
+status, assuming it didn't occur during a port state change.
 
 ## Ready to go!
 
